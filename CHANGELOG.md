@@ -1,4 +1,9 @@
 ## 3.71.0 (Unreleased)
+## 3.70.1 (June 02, 2021)
+
+IMPROVEMENTS:
+* compute: Add IAP support to `google_compute_region_backend_service` ([#9279](https://github.com/hashicorp/terraform-provider-google/issues/9279))
+
 ## 3.70.0 (June 01, 2021)
 
 IMPROVEMENTS:

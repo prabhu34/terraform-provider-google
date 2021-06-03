@@ -111,6 +111,39 @@ func TestAccComputeRegionBackendService_withBackendInternalManaged(t *testing.T)
 	})
 }
 
+func TestAccComputeRegionBackendService_withBackendAndIAP(t *testing.T) {
+	serviceName := fmt.Sprintf("tf-test-%s", randString(t, 10))
+	igName := fmt.Sprintf("tf-test-%s", randString(t, 10))
+	itName := fmt.Sprintf("tf-test-%s", randString(t, 10))
+	checkName := fmt.Sprintf("tf-test-%s", randString(t, 10))
+	vcrTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckComputeRegionBackendServiceDestroyProducer(t),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccComputeRegionBackendService_withBackendAndIAP(
+					serviceName, igName, itName, checkName, 10),
+			},
+			{
+				ResourceName:            "google_compute_region_backend_service.lipsum",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"iap.0.oauth2_client_secret"},
+			},
+			{
+				Config: testAccComputeBackendService_withBackend(
+					serviceName, igName, itName, checkName, 10),
+			},
+			{
+				ResourceName:      "google_compute_region_backend_service.lipsum",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccComputeRegionBackendService_withBackendMultiNic(t *testing.T) {
 	t.Parallel()
 
@@ -367,6 +400,68 @@ resource "google_compute_health_check" "default" {
   tcp_health_check {
     port = 443
   }
+}
+`, serviceName, timeout, igName, itName, checkName)
+}
+
+func testAccComputeRegionBackendService_withBackendAndIAP(
+	serviceName, igName, itName, checkName string, timeout int64) string {
+	return fmt.Sprintf(`
+data "google_compute_image" "my_image" {
+  family  = "debian-9"
+  project = "debian-cloud"
+}
+
+resource "google_compute_region_backend_service" "lipsum" {
+  name        = "%s"
+  description = "Hello World 1234"
+  port_name   = "http"
+  protocol    = "HTTP"
+  timeout_sec = %v
+
+  backend {
+    group = google_compute_instance_group_manager.foobar.instance_group
+  }
+
+  iap {
+    oauth2_client_id     = "test"
+    oauth2_client_secret = "test"
+  }
+
+  health_checks = [google_compute_http_health_check.default.self_link]
+}
+
+resource "google_compute_instance_group_manager" "foobar" {
+  name = "%s"
+  version {
+    instance_template = google_compute_instance_template.foobar.self_link
+    name              = "primary"
+  }
+  base_instance_name = "foobar"
+  zone               = "us-central1-f"
+  target_size        = 1
+}
+
+resource "google_compute_instance_template" "foobar" {
+  name         = "%s"
+  machine_type = "e2-medium"
+
+  network_interface {
+    network = "default"
+  }
+
+  disk {
+    source_image = data.google_compute_image.my_image.self_link
+    auto_delete  = true
+    boot         = true
+  }
+}
+
+resource "google_compute_http_health_check" "default" {
+  name               = "%s"
+  request_path       = "/"
+  check_interval_sec = 1
+  timeout_sec        = 1
 }
 `, serviceName, timeout, igName, itName, checkName)
 }

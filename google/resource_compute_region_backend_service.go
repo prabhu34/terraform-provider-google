@@ -1230,7 +1230,7 @@ func resourceComputeRegionBackendServiceRead(d *schema.ResourceData, meta interf
 	if err := d.Set("health_checks", flattenComputeRegionBackendServiceHealthChecks(res["healthChecks"], d, config)); err != nil {
 		return fmt.Errorf("Error reading RegionBackendService: %s", err)
 	}
-	if err := d.Set("iap", flattenComputeBackendServiceIap(res["iap"], d, config)); err != nil {
+	if err := d.Set("iap", flattenComputeRegionBackendServiceIap(res["iap"], d, config)); err != nil {
 		return fmt.Errorf("Error reading BackendService: %s", err)
 	}
 	if err := d.Set("load_balancing_scheme", flattenComputeRegionBackendServiceLoadBalancingScheme(res["loadBalancingScheme"], d, config)); err != nil {
@@ -2058,7 +2058,7 @@ func flattenComputeRegionBackendServiceHealthChecks(v interface{}, d *schema.Res
 	return convertAndMapStringArr(v.([]interface{}), ConvertSelfLinkToV1)
 }
 
-func flattenComputeBackendServiceIap(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+func flattenComputeRegionBackendServiceIap(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	if v == nil {
 		return nil
 	}
@@ -2068,22 +2068,22 @@ func flattenComputeBackendServiceIap(v interface{}, d *schema.ResourceData, conf
 	}
 	transformed := make(map[string]interface{})
 	transformed["oauth2_client_id"] =
-		flattenComputeBackendServiceIapOauth2ClientId(original["oauth2ClientId"], d, config)
+		flattenComputeRegionBackendServiceIapOauth2ClientId(original["oauth2ClientId"], d, config)
 	transformed["oauth2_client_secret"] =
-		flattenComputeBackendServiceIapOauth2ClientSecret(original["oauth2ClientSecret"], d, config)
+		flattenComputeRegionBackendServiceIapOauth2ClientSecret(original["oauth2ClientSecret"], d, config)
 	transformed["oauth2_client_secret_sha256"] =
-		flattenComputeBackendServiceIapOauth2ClientSecretSha256(original["oauth2ClientSecretSha256"], d, config)
+		flattenComputeRegionBackendServiceIapOauth2ClientSecretSha256(original["oauth2ClientSecretSha256"], d, config)
 	return []interface{}{transformed}
 }
-func flattenComputeBackendServiceIapOauth2ClientId(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+func flattenComputeRegionBackendServiceIapOauth2ClientId(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	return v
 }
 
-func flattenComputeBackendServiceIapOauth2ClientSecret(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+func flattenComputeRegionBackendServiceIapOauth2ClientSecret(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	return d.Get("iap.0.oauth2_client_secret")
 }
 
-func flattenComputeBackendServiceIapOauth2ClientSecretSha256(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+func flattenComputeRegionBackendServiceIapOauth2ClientSecretSha256(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	return v
 }
 
@@ -3297,7 +3297,7 @@ func resourceComputeRegionBackendServiceEncoder(d *schema.ResourceData, meta int
 		iap["enabled"] = true
 		obj["iap"] = iap
 	}
-	
+
 	if d.Get("load_balancing_scheme").(string) == "INTERNAL_MANAGED" {
 		return obj, nil
 	}
@@ -3347,7 +3347,7 @@ func resourceComputeRegionBackendServiceDecoder(d *schema.ResourceData, meta int
 	if ok && m["enabled"] == false {
 		delete(res, "iap")
 	}
-	
+
 	// Requests with consistentHash will error for specific values of
 	// localityLbPolicy. However, the API will not remove it if the backend
 	// service is updated to from supporting to non-supporting localityLbPolicy

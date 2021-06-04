@@ -132,7 +132,7 @@ func TestAccComputeRegionBackendService_withBackendAndIAP(t *testing.T) {
 				ImportStateVerifyIgnore: []string{"iap.0.oauth2_client_secret"},
 			},
 			{
-				Config: testAccComputeBackendService_withBackend(
+				Config: testAccComputeRegionBackendService_withBackend(
 					serviceName, igName, itName, checkName, 10),
 			},
 			{

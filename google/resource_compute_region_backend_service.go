@@ -1012,7 +1012,7 @@ func resourceComputeRegionBackendServiceCreate(d *schema.ResourceData, meta inte
 	} else if v, ok := d.GetOkExists("health_checks"); !isEmptyValue(reflect.ValueOf(healthChecksProp)) && (ok || !reflect.DeepEqual(v, healthChecksProp)) {
 		obj["healthChecks"] = healthChecksProp
 	}
-	iapProp, err := expandComputeBackendServiceIap(d.Get("iap"), d, config)
+	iapProp, err := expandComputeRegionBackendServiceIap(d.Get("iap"), d, config)
 	if err != nil {
 		return err
 	} else if v, ok := d.GetOkExists("iap"); ok || !reflect.DeepEqual(v, iapProp) {
@@ -1355,7 +1355,7 @@ func resourceComputeRegionBackendServiceUpdate(d *schema.ResourceData, meta inte
 	} else if v, ok := d.GetOkExists("health_checks"); !isEmptyValue(reflect.ValueOf(v)) && (ok || !reflect.DeepEqual(v, healthChecksProp)) {
 		obj["healthChecks"] = healthChecksProp
 	}
-	iapProp, err := expandComputeBackendServiceIap(d.Get("iap"), d, config)
+	iapProp, err := expandComputeRegionBackendServiceIap(d.Get("iap"), d, config)
 	if err != nil {
 		return err
 	} else if v, ok := d.GetOkExists("iap"); ok || !reflect.DeepEqual(v, iapProp) {
@@ -2961,7 +2961,7 @@ func expandComputeRegionBackendServiceHealthChecks(v interface{}, d TerraformRes
 	return v, nil
 }
 
-func expandComputeBackendServiceIap(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+func expandComputeRegionBackendServiceIap(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	l := v.([]interface{})
 	if len(l) == 0 || l[0] == nil {
 		return nil, nil
@@ -2970,21 +2970,21 @@ func expandComputeBackendServiceIap(v interface{}, d TerraformResourceData, conf
 	original := raw.(map[string]interface{})
 	transformed := make(map[string]interface{})
 
-	transformedOauth2ClientId, err := expandComputeBackendServiceIapOauth2ClientId(original["oauth2_client_id"], d, config)
+	transformedOauth2ClientId, err := expandComputeRegionBackendServiceIapOauth2ClientId(original["oauth2_client_id"], d, config)
 	if err != nil {
 		return nil, err
 	} else if val := reflect.ValueOf(transformedOauth2ClientId); val.IsValid() && !isEmptyValue(val) {
 		transformed["oauth2ClientId"] = transformedOauth2ClientId
 	}
 
-	transformedOauth2ClientSecret, err := expandComputeBackendServiceIapOauth2ClientSecret(original["oauth2_client_secret"], d, config)
+	transformedOauth2ClientSecret, err := expandComputeRegionBackendServiceIapOauth2ClientSecret(original["oauth2_client_secret"], d, config)
 	if err != nil {
 		return nil, err
 	} else {
 		transformed["oauth2ClientSecret"] = transformedOauth2ClientSecret
 	}
 
-	transformedOauth2ClientSecretSha256, err := expandComputeBackendServiceIapOauth2ClientSecretSha256(original["oauth2_client_secret_sha256"], d, config)
+	transformedOauth2ClientSecretSha256, err := expandComputeRegionBackendServiceIapOauth2ClientSecretSha256(original["oauth2_client_secret_sha256"], d, config)
 	if err != nil {
 		return nil, err
 	} else if val := reflect.ValueOf(transformedOauth2ClientSecretSha256); val.IsValid() && !isEmptyValue(val) {
@@ -2994,15 +2994,15 @@ func expandComputeBackendServiceIap(v interface{}, d TerraformResourceData, conf
 	return transformed, nil
 }
 
-func expandComputeBackendServiceIapOauth2ClientId(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+func expandComputeRegionBackendServiceIapOauth2ClientId(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	return v, nil
 }
 
-func expandComputeBackendServiceIapOauth2ClientSecret(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+func expandComputeRegionBackendServiceIapOauth2ClientSecret(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	return v, nil
 }
 
-func expandComputeBackendServiceIapOauth2ClientSecretSha256(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+func expandComputeRegionBackendServiceIapOauth2ClientSecretSha256(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	return v, nil
 }
 
